@@ -4,7 +4,6 @@ import WikipediaApi from '../../services/httpClients/wikipedia'
 const getWikipediaArticle = async (req: Request, res: Response): Promise<void> => {
   try {
     const { articleName }  = req.params
-
     const validationRegex = new RegExp("^[0-9A-Za-z_-]+$")
     if (!articleName || !validationRegex.test(articleName)) {
       res
@@ -15,8 +14,8 @@ const getWikipediaArticle = async (req: Request, res: Response): Promise<void> =
             : `Please do not include characters other than letters, hyphens (-), underscores (_) and numbers` 
         });
     }
-
-    const wikipediaApi = new WikipediaApi(articleName);
+    const languageHeader = req.headers["accept-language"] || 'en';
+    const wikipediaApi = new WikipediaApi(articleName, languageHeader);
     const { query } = await wikipediaApi.getArticle();
     const currentUnix = new Date().getTime();
 
@@ -40,7 +39,8 @@ const getWikipediaArticle = async (req: Request, res: Response): Promise<void> =
       .json({ 
         scrapeDate: currentUnix,
         articleName: data.title,
-        introduction: data.extract 
+        introduction: data.extract,
+        heaeder: req.headers 
       })
   } catch (error) {
     throw error

@@ -26,7 +26,8 @@ const getWikipediaArticle = (req, res) => __awaiter(void 0, void 0, void 0, func
                     : `Please do not include characters other than letters, hyphens (-), underscores (_) and numbers`
             });
         }
-        const wikipediaApi = new wikipedia_1.default(articleName);
+        const languageHeader = req.headers["accept-language"] || 'en';
+        const wikipediaApi = new wikipedia_1.default(articleName, languageHeader);
         const { query } = yield wikipediaApi.getArticle();
         const currentUnix = new Date().getTime();
         if (!query || (query === null || query === void 0 ? void 0 : query.pages["-1"])) {
@@ -47,7 +48,8 @@ const getWikipediaArticle = (req, res) => __awaiter(void 0, void 0, void 0, func
             .json({
             scrapeDate: currentUnix,
             articleName: data.title,
-            introduction: data.extract
+            introduction: data.extract,
+            heaeder: req.headers
         });
     }
     catch (error) {
